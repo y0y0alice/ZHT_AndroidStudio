@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.hikvision.ezviz:ezuikit-2.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/ezuikit-2.0.aar/a303a5e840375e99cd591ef9b9f5784a/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/ezuikit-2.0.aar/a303a5e840375e99cd591ef9b9f5784a/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.hikvision.ezviz/ezuikit/2.0/b94af4115753c9fc7a93ae518f0621d69674afc0/ezuikit-2.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

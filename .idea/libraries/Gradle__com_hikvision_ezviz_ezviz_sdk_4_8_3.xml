@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.hikvision.ezviz:ezviz-sdk-4.8.3">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/ezviz-sdk-4.8.3.aar/0b77330c1284122eadcf0ae107cd5f77/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/ezviz-sdk-4.8.3.aar/0b77330c1284122eadcf0ae107cd5f77/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.hikvision.ezviz/ezviz-sdk/4.8.3/5e6e725b124f364bd87922cc6c26846a7105de3c/ezviz-sdk-4.8.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
