@@ -12,6 +12,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,12 +20,11 @@ import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.text.TextUtils;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -36,7 +36,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -46,7 +46,6 @@ import com.dothantech.lpapi.AtBitmap;
 import com.dothantech.printer.IDzPrinter.PrintParamName;
 import com.dothantech.lpapi.LPAPI;
 import com.dothantech.printer.IDzPrinter;
-import com.google.gson.JsonArray;
 import com.google.zxing.client.android.CaptureActivity;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.PersistentCookieStore;
@@ -82,7 +81,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,6 +103,8 @@ public class MainActivity extends Activity implements JSBridge, ILocation {
     FileReceiver fileReceiver = new FileReceiver();
     Bundle bundle = null;
     Button btnSetting;
+    Button onlineBtn;//在线加载
+    Button offlineBtn;//离线加载
     Button btnOrientation;
     RelativeLayout settingView;
     boolean isTab = false;
@@ -114,6 +114,11 @@ public class MainActivity extends Activity implements JSBridge, ILocation {
     Dialog dialog;
     LPAPI api;
     List<IDzPrinter.PrinterAddress> pairedPrinters = new ArrayList<IDzPrinter.PrinterAddress>();
+    private static String[] PERMISSIONS_STORAGE = {
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
 
     // LPAPI 打印机操作相关的回调函数。
     private final LPAPI.Callback mCallback = new LPAPI.Callback() {
@@ -193,8 +198,126 @@ public class MainActivity extends Activity implements JSBridge, ILocation {
         }
     };
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        verifyStoragePermissions(this);
+        super.onCreate(savedInstanceState);
+        Dao dao = new Dao(this);
+        dao.initTable();
+
+        setContentView(R.layout.activity_login_options);
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
+        // TODO Auto-generated method stub
+        Log.d("Msg", "SharedPreferences");
+        final SharedPreferences settings = PreferenceManager
+                .getDefaultSharedPreferences(this);
+        //在线地址
+        String addressString = settings.getString("address_preference", "");
+        if (!addressString.equals("") && !addressString.endsWith("/"))
+            addressString = addressString + "/";
+        //离线地址
+        final String offlineString = settings.getString("address_offline", "");
+
+        btnSetting = (Button) findViewById(R.id.setting);
+        btnSetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                if (Config.customSetting) {
+                    Intent intent = new Intent(MainActivity.this,
+                            CustomSettingActivity.class);
+                    startActivityForResult(intent, Config.SETTING_REQUEST_CODE);
+                } else {
+                    Intent intent = new Intent(MainActivity.this,
+                            SettingActivity.class);
+                    startActivityForResult(intent, Config.SETTING_REQUEST_CODE);
+                }
+            }
+        });
+        final LinearLayout settingView2 = (LinearLayout) findViewById(R.id.optionView);
+        httpClient = new AsyncHttpClient();
+        httpClient.setTimeout(120000);
+        mWebView = (JSWebView) findViewById(R.id.webView);
+        mWebView.setWebViewClient(new WebClient());
+        mWebView.setWebChromeClient(new WebChrome());
+        final WebSettings webSetting = mWebView.getSettings();
+        webSetting.setJavaScriptEnabled(true);
+        webSetting.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        webSetting.setAllowFileAccess(true);
+        webSetting.setAppCacheEnabled(true);
+        webSetting.setDomStorageEnabled(true);
+        webSetting.setDatabaseEnabled(true);
+        webSetting.setUseWideViewPort(true);
+        webSetting.setLoadWithOverviewMode(true);
+        //lufei20180926
+        webSetting.setAppCacheMaxSize(1024 * 1024 * 8);//设置缓冲大小，我设的是8M
+        String appCacheDir = this.getApplicationContext().getDir("cache", Context.MODE_PRIVATE).getPath();
+        webSetting.setAppCachePath(appCacheDir);
+
+        //在线加载
+        onlineBtn = (Button) findViewById(R.id.onlineBtn);
+        final String finalAddressString = addressString;
+        onlineBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                App.shared.setHost(finalAddressString);
+                String loadUrl = App.shared.getUrl(Config.MainPage);
+                if (!loadUrl.equals("")) {
+                    webSetting.setCacheMode(WebSettings.LOAD_NO_CACHE);
+                    settingView2.setVisibility(View.GONE);
+                    mWebView.loadUrl(loadUrl);
+                }
+            }
+        });
+        //离线加载
+        offlineBtn = (Button) findViewById(R.id.offlineBtn);
+        offlineBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String loadUrl = offlineString;
+                if (!loadUrl.equals("")) {
+                    settingView2.setVisibility(View.GONE);
+                    webSetting.setCacheMode(WebSettings.LOAD_DEFAULT);
+                    mWebView.loadUrl(loadUrl);
+                }
+            }
+        });
+        settingView2.setVisibility(View.VISIBLE);
+        App.shared.startTagService();
+        App.shared.setFirstload(false);
+
+        // 初始化 IDzPrinter 对象（简单起见，不处理结果通知）
+        IDzPrinter.Factory.getInstance().init(this, null);
+
+        // 调用LPAPI对象的init方法初始化对象
+        this.api = LPAPI.Factory.createInstance(mCallback);
+    }
+
+    /**
+     * Checks if the app has permission to write to device storage
+     * <p>
+     * If the app does not has permission then the user will be prompted to grant permissions
+     *
+     * @param activity
+     */
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+    }
+
+    //     @Override
+    protected void onCreate1(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -278,6 +401,8 @@ public class MainActivity extends Activity implements JSBridge, ILocation {
         webSetting.setDatabaseEnabled(true);
         webSetting.setUseWideViewPort(true);
         webSetting.setLoadWithOverviewMode(true);
+//缓存设置
+
         mWebView.addJavascriptInterface(this);
 
         if (Config.disableCache) {
@@ -1302,7 +1427,7 @@ public class MainActivity extends Activity implements JSBridge, ILocation {
             //默认值单位mm
             double width = 50;//页面宽度
             double height = 30;//页面高度
-            double fontHeight =2.5;//字体高度
+            double fontHeight = 2.5;//字体高度
             double lineSpacing = 0.5;//行间距
             double oneHeight = 6;//一维码行高度
             double oneWidth = 40;//一维码行宽度
@@ -1418,8 +1543,8 @@ public class MainActivity extends Activity implements JSBridge, ILocation {
             if (state == null || state.equals(IDzPrinter.PrinterState.Disconnected)) {
                 Toast.makeText(MainActivity.this, "打印机" + printerAddress.shownName + "未连接，请确保蓝牙已连上打印机,并到蓝牙设置中删除不需要连接的打印机。", Toast.LENGTH_SHORT).show();
                 return false;
-            }else if(state.equals(IDzPrinter.PrinterState.Connecting)){
-                Toast.makeText(MainActivity.this, "正在尝试连接"+ printerAddress.shownName + "打印机，请确保蓝牙已连上打印机,并到蓝牙设置中删除不需要连接的打印机。。", Toast.LENGTH_SHORT).show();
+            } else if (state.equals(IDzPrinter.PrinterState.Connecting)) {
+                Toast.makeText(MainActivity.this, "正在尝试连接" + printerAddress.shownName + "打印机，请确保蓝牙已连上打印机,并到蓝牙设置中删除不需要连接的打印机。。", Toast.LENGTH_SHORT).show();
                 return false;
             } else {
                 Toast.makeText(MainActivity.this, "打印机" + printerAddress.shownName + "已连接", Toast.LENGTH_SHORT).show();
