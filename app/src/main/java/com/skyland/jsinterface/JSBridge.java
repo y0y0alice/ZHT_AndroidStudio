@@ -63,4 +63,10 @@ public interface JSBridge {
 
     @JavascriptInterface
     public abstract void printTextByJC(String parameter, JSFunction callback);
+
+    @JavascriptInterface
+    public abstract void sqliteExecuteSql(String parameter, JSFunction callback);
+
+    @JavascriptInterface
+    public abstract void sqliteSaveToLocal(String parameter, JSFunction callback);
 }

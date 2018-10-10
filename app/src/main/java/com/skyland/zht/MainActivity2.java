@@ -994,4 +994,12 @@ public class MainActivity2 extends Activity implements JSBridge,ILocation {
 	public void printTextByJC(String parameter,JSFunction callback) {
 
 	}
+
+	@Override
+	public void sqliteExecuteSql(String parameter, JSFunction callback) {
+	}
+
+	@Override
+	public void sqliteSaveToLocal(String parameter, JSFunction callback) {
+	}
 }

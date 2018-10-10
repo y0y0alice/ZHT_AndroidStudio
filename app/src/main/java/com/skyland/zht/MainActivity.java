@@ -1,5 +1,6 @@
 package com.skyland.zht;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -22,9 +23,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -76,10 +79,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -119,7 +119,7 @@ public class MainActivity extends Activity implements JSBridge, ILocation {
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
-
+    private Dao dao;
     // LPAPI 打印机操作相关的回调函数。
     private final LPAPI.Callback mCallback = new LPAPI.Callback() {
 
@@ -199,12 +199,13 @@ public class MainActivity extends Activity implements JSBridge, ILocation {
     };
 
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    //    @Override
+    protected void onCreate1(Bundle savedInstanceState) {
         verifyStoragePermissions(this);
         super.onCreate(savedInstanceState);
-        Dao dao = new Dao(this);
-        dao.initTable();
+        dao = new Dao(this);
+        //初始化建基本表
+        dao.initSysTable();
 
         setContentView(R.layout.activity_login_options);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -316,10 +317,20 @@ public class MainActivity extends Activity implements JSBridge, ILocation {
         }
     }
 
-    //     @Override
-    protected void onCreate1(Bundle savedInstanceState) {
+    private void initPhotoError(){
+        // android 7.0系统解决拍照的问题
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
+        builder.detectFileUriExposure();
+    }
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        verifyStoragePermissions(this);
+        initPhotoError();
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         progressDialog = new ProgressDialog(this);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -479,6 +490,9 @@ public class MainActivity extends Activity implements JSBridge, ILocation {
         // 调用LPAPI对象的init方法初始化对象
         this.api = LPAPI.Factory.createInstance(mCallback);
 
+//        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+//        StrictMode.setVmPolicy(builder.build());
+//        builder.detectFileUriExposure();
     }
 
     @Override
@@ -606,8 +620,16 @@ public class MainActivity extends Activity implements JSBridge, ILocation {
         startActivityForResult(intent, Config.ALBUM_IMAGE_ACTIVITY_REQUEST_CODE);
     }
 
+
+
     @Override
     public void takephoto(String parameter, JSFunction callback) {
+        if(ContextCompat.checkSelfPermission(
+                this,Manifest.permission.CAMERA)!=  PackageManager.PERMISSION_GRANTED)
+        {ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.CAMERA},
+                1);
+        }
         data = parameter;
         jsCallBack = callback;
         path = Utility.getPath(this, MediaType.Photo);
@@ -1480,6 +1502,7 @@ public class MainActivity extends Activity implements JSBridge, ILocation {
         }
     }
 
+
     //图片打印
     public void printImageByJC(String parameter, JSFunction callback) {
         try {
@@ -1555,6 +1578,24 @@ public class MainActivity extends Activity implements JSBridge, ILocation {
             return false;
         }
     }
+
+    public void sqliteExecuteSql(String parameter, JSFunction callback) {
+
+    }
+
+    @Override
+    public void sqliteSaveToLocal(String parameter, JSFunction callback) {
+        try {
+            JSONObject obj = new JSONObject(parameter);
+            if (obj.has("key") && obj.has("value")) {
+                dao.SaveToLacal(obj.get("key").toString(), obj.get("value").toString());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Toast.makeText(MainActivity.this, "保存失败" + e.getMessage(), Toast.LENGTH_SHORT);
+        }
+    }
+
 
     //    回调接口
     public interface OnDataFinishedListener {

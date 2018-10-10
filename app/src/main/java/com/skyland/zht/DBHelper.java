@@ -1,6 +1,7 @@
 package com.skyland.zht;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
@@ -13,7 +14,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "skyland.db";
 
     public DBHelper(Context context) {
-        super(context, getMyDatabaseName(context), null,DB_VERSION);
+        super(context, getMyDatabaseName(context), null, DB_VERSION);
     }
 
     @Override
@@ -30,7 +31,7 @@ public class DBHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-    private static String  getMyDatabaseName(Context context) {
+    private static String getMyDatabaseName(Context context) {
         File outerPath = Environment.getExternalStorageDirectory();
         String databasename = DB_NAME;
         boolean isSdcardEnable = false;
@@ -51,11 +52,25 @@ public class DBHelper extends SQLiteOpenHelper {
             dbPath = context.getFilesDir().getPath() + "/database/";
         }
         File dbp = new File(dbPath);
-        boolean iscreate =true;
+        boolean iscreate = true;
         if (!dbp.exists()) {
-            iscreate =  dbp.mkdirs();
+            iscreate = dbp.mkdirs();
         }
         databasename = dbPath + DB_NAME;
         return databasename;
+    }
+
+    //检查表是否存在
+    public static boolean tableExist(SQLiteDatabase db, String tatbleName) {
+        boolean result = false;
+        Cursor cursor = null;
+        cursor = db.rawQuery("select count(*)  from sqlite_master where type='table' and name = '" + tatbleName + "';", null);
+        if (cursor.moveToFirst()) {
+            int count = cursor.getInt(0);
+            if (count > 0) {
+                result = true;
+            }
+        }
+        return result;
     }
 }

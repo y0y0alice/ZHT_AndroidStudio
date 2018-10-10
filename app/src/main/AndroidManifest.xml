@@ -23,7 +23,7 @@
         android:name="com.skyland.zht.permission.WRITE_EXTERNAL_STORAGE"
         android:protectionLevel="signature" />
 
-
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
     <uses-permission android:name="android.permission.CHANGE_CONFIGURATION" />
     <uses-permission android:name="com.skyland.zht.permission.JPUSH_MESSAGE" />
     <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
