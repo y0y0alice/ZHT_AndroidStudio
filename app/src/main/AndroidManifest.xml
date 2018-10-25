@@ -85,7 +85,7 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="7a8f2aab0b78494d79b8c8eb24fdc174"></meta-data>
+            android:value="3177071dc195737a5525016ddd81b4ee"></meta-data>
         <meta-data
             android:name="QBSDKAppKey"
             android:value="GXh9X4NOrMG8wB8qZI+jTV4A"></meta-data>

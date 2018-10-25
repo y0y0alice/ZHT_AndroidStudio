@@ -25,6 +25,8 @@ import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.tencent.smtt.sdk.QbSdk;
 import com.videogo.openapi.EZOpenSDK;
@@ -106,12 +108,16 @@ public class App extends Application {
         @Override
         public void onLocationChanged(AMapLocation loc) {
             if (null != loc) {
+                if (loc.getErrorCode() == 0){
                 //解析定位结果
                 //String result = Utils.getLocationStr(loc);
                 double latitude = loc.getLatitude();
                 double longitude = loc.getLongitude();
                 if (iLocation != null) {
                     iLocation.OnLocationResult(latitude, longitude);
+                }
+                }else{
+                    Log.e("AmapError","location Error, ErrCode: "+ loc.getErrorCode() + ", errInfo:" + loc.getErrorInfo());
                 }
             } else {
 

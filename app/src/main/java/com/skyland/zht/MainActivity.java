@@ -90,7 +90,7 @@ import cn.finalteam.galleryfinal.GalleryFinal;
 import cn.finalteam.galleryfinal.model.PhotoInfo;
 import cn.jpush.android.api.JPushInterface;
 
-public class MainActivity extends Activity implements JSBridge, ILocation {
+public class MainActivity extends CheckPermissionsActivity implements JSBridge, ILocation {
 
     JSWebView mWebView;
     ProgressBar mProgressBar;
@@ -201,7 +201,7 @@ public class MainActivity extends Activity implements JSBridge, ILocation {
 
     //    @Override
     protected void onCreate1(Bundle savedInstanceState) {
-        verifyStoragePermissions(this);
+     //   verifyStoragePermissions(this);
         super.onCreate(savedInstanceState);
         dao = new Dao(this);
         //初始化建基本表
@@ -329,7 +329,7 @@ public class MainActivity extends Activity implements JSBridge, ILocation {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        verifyStoragePermissions(this);
+  //      verifyStoragePermissions(this);
         initPhotoError();
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         progressDialog = new ProgressDialog(this);
