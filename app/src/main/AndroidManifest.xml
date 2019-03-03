@@ -18,12 +18,11 @@
     <permission
         android:name="com.skyland.zht.permission.JPUSH_MESSAGE"
         android:protectionLevel="signature" />
-
     <permission
         android:name="com.skyland.zht.permission.WRITE_EXTERNAL_STORAGE"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="android.permission.CALL_PHONE"/>
+    <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.CHANGE_CONFIGURATION" />
     <uses-permission android:name="com.skyland.zht.permission.JPUSH_MESSAGE" />
     <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
@@ -33,7 +32,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <!--<uses-permission android:name="android.permission.WRITE_SETTINGS" />-->
+    <!-- <uses-permission android:name="android.permission.WRITE_SETTINGS" /> -->
     <uses-permission android:name="com.android.browser.permission.READ_HISTORY_BOOKMARKS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -47,7 +46,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <!--<uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />-->
+    <!-- <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" /> -->
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <!-- 蓝牙相关 -->
@@ -85,10 +84,10 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="3177071dc195737a5525016ddd81b4ee"></meta-data>
+            android:value="3177071dc195737a5525016ddd81b4ee" />
         <meta-data
             android:name="QBSDKAppKey"
-            android:value="GXh9X4NOrMG8wB8qZI+jTV4A"></meta-data>
+            android:value="GXh9X4NOrMG8wB8qZI+jTV4A" />
 
         <activity
             android:name=".MainActivity"
@@ -111,17 +110,17 @@
             android:name=".MainActivity2"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeFullScreen"></activity>
+            android:theme="@style/AppThemeFullScreen" />
         <activity
             android:name=".SettingActivity"
             android:label="@string/title_activity_setting"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeFullScreen"></activity>
+            android:theme="@style/AppThemeFullScreen" />
         <activity
             android:name=".RecordActivity"
             android:label="@string/title_activity_record"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeFullScreen"></activity>
+            android:theme="@style/AppThemeFullScreen" />
         <activity
             android:name="com.google.zxing.client.android.CaptureActivity"
             android:clearTaskOnLaunch="true"
@@ -189,7 +188,7 @@
         <activity
             android:name="cn.jpush.android.ui.PopWinActivity"
             android:exported="false"
-            android:theme="@style/MyDialogStyle"></activity>
+            android:theme="@style/MyDialogStyle" />
 
         <!-- Required SDK核心功能 -->
         <activity
@@ -208,7 +207,7 @@
         <service
             android:name="cn.jpush.android.service.DownloadService"
             android:enabled="true"
-            android:exported="false"></service>
+            android:exported="false" />
 
         <!-- Required SDK 核心功能 -->
         <!-- 可配置android:process参数将PushService放在其他进程中 -->
@@ -275,24 +274,23 @@
             android:name="JPUSH_APPKEY"
             android:value="453e0a160258b7bdc1067b25" /> <!-- </>值来自开发者平台取得的AppKey -->
 
-        <receiver android:name=".ConnectionReceiver"></receiver>
+        <receiver android:name=".ConnectionReceiver" />
 
-        <service android:name=".TagService"></service>
-        <service android:name=".UpdateService"></service>
+        <service android:name=".TagService" />
+        <service android:name=".UpdateService" />
 
         <activity
             android:name=".CustomSettingActivity"
             android:label="@string/title_activity_custom_setting"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeFullScreen"></activity>
-
+            android:theme="@style/AppThemeFullScreen" />
         <activity
             android:name=".LoginActivity"
             android:label="LoginActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeFullScreen"></activity>
+            android:theme="@style/AppThemeFullScreen" />
 
-        <service android:name="com.amap.api.location.APSService"></service>
+        <service android:name="com.amap.api.location.APSService" />
 
         <activity
             android:name="cn.finalteam.galleryfinal.PhotoSelectActivity"
@@ -317,10 +315,30 @@
 
         <activity
             android:name=".VideoActivity"
-            android:label="@string/title_activity_video"
-            android:configChanges="keyboardHidden|orientation|screenSize">
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_video"></activity>
 
-        </activity>
+        <service android:name="cn.wps.moffice.demo.agent.AgentMessageService">
+            <intent-filter>
+                <action android:name="cn.wps.moffice.agent.OfficeServiceAgent2" />
+            </intent-filter>
+        </service>
+        <service android:name="cn.wps.moffice.demo.client.MOfficeClientService">
+            <intent-filter>
+                <action android:name="cn.wps.moffice.client.OfficeServiceClient2" />
+            </intent-filter>
+        </service>
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.skyland.zht.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
+
     </application>
 
 </manifest>

@@ -96,7 +96,6 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental-verifier" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/instant-run-apk" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/instant-run-main-apk-res" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/instant-run-resources" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/javaPrecompile" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jniLibs" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifest-checker" />
@@ -120,6 +119,7 @@
     <orderEntry type="library" name="Gradle: com.android.support:animated-vector-drawable-24.0.0" level="project" />
     <orderEntry type="library" name="Gradle: __local_aars__:D.\Android\ZHT_AndroidStudio\app\libs\DzPrinter.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: javax.jmdns:jmdns:3.4.1@jar" level="project" />
+    <orderEntry type="library" name="Gradle: __local_aars__:D.\Android\ZHT_AndroidStudio\app\libs\AMap_Location_V4.2.0_20180809.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: __local_aars__:D.\Android\ZHT_AndroidStudio\app\libs\xUtils-2.6.14.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.hikvision.ezviz:ezuikit-2.0" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-annotations:24.0.0@jar" level="project" />
@@ -128,9 +128,9 @@
     <orderEntry type="library" name="Gradle: __local_aars__:D.\Android\ZHT_AndroidStudio\app\libs\core-3.1.0.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: __local_aars__:D.\Android\ZHT_AndroidStudio\app\libs\tbs_sdk_thirdapp_v2.6.0.1045_36900_sharewithdownload_obfs_20161207_162008.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: __local_aars__:D.\Android\ZHT_AndroidStudio\app\libs\toolfinal.jar:unspecified@jar" level="project" />
+    <orderEntry type="library" name="Gradle: __local_aars__:D.\Android\ZHT_AndroidStudio\app\libs\iAppOffice_V3.2.0.264_20180928A.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.8.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-v4-24.0.0" level="project" />
-    <orderEntry type="library" name="Gradle: __local_aars__:D.\Android\ZHT_AndroidStudio\app\libs\AMap_Location_V3.1.0_20161027.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:appcompat-v7-24.0.0" level="project" />
     <orderEntry type="library" name="Gradle: com.hikvision.ezviz:ezviz-sdk-4.8.3" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.http.legacy-android-24" level="project" />

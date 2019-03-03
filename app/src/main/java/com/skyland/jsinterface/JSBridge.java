@@ -65,6 +65,9 @@ public interface JSBridge {
     public abstract void printTextByJC(String parameter, JSFunction callback);
 
     @JavascriptInterface
+    public abstract void phoneEdit(String parameter, JSFunction callback);
+
+    @JavascriptInterface
     public abstract void sqliteExecuteSql(String parameter, JSFunction callback);
 
     @JavascriptInterface

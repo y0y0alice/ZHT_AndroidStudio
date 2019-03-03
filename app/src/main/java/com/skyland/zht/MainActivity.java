@@ -57,6 +57,7 @@ import com.loopj.android.http.TextHttpResponseHandler;
 import com.skyland.jsinterface.JSBridge;
 import com.skyland.jsinterface.JSFunction;
 import com.skyland.jsinterface.JSWebView;
+import com.skyland.zht.iappoffice.MobEdit;
 import com.tencent.smtt.export.external.interfaces.JsResult;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebSettings;
@@ -201,7 +202,7 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
 
     //    @Override
     protected void onCreate1(Bundle savedInstanceState) {
-     //   verifyStoragePermissions(this);
+        //   verifyStoragePermissions(this);
         super.onCreate(savedInstanceState);
         dao = new Dao(this);
         //初始化建基本表
@@ -317,7 +318,7 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
         }
     }
 
-    private void initPhotoError(){
+    private void initPhotoError() {
         // android 7.0系统解决拍照的问题
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
@@ -329,7 +330,7 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-  //      verifyStoragePermissions(this);
+        //      verifyStoragePermissions(this);
         initPhotoError();
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         progressDialog = new ProgressDialog(this);
@@ -621,14 +622,13 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
     }
 
 
-
     @Override
     public void takephoto(String parameter, JSFunction callback) {
-        if(ContextCompat.checkSelfPermission(
-                this,Manifest.permission.CAMERA)!=  PackageManager.PERMISSION_GRANTED)
-        {ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.CAMERA},
-                1);
+        if (ContextCompat.checkSelfPermission(
+                this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    1);
         }
         data = parameter;
         jsCallBack = callback;
@@ -1502,6 +1502,11 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
         }
     }
 
+    @Override
+    public void phoneEdit(String parameter, JSFunction callback) {
+        MobEdit mobEdit = new MobEdit(parameter, this);
+    }
+
 
     //图片打印
     public void printImageByJC(String parameter, JSFunction callback) {
@@ -1678,4 +1683,5 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
 
         return param;
     }
+
 }

@@ -996,6 +996,11 @@ public class MainActivity2 extends Activity implements JSBridge,ILocation {
 	}
 
 	@Override
+	public void phoneEdit(String parameter, JSFunction callback) {
+
+	}
+
+	@Override
 	public void sqliteExecuteSql(String parameter, JSFunction callback) {
 	}
 
