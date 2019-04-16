@@ -1248,8 +1248,8 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
                 + longitude + "}";
         jsCallBack.executeWithParams(args);
     }
-
     @Override
+
     @JavascriptInterface
     public void getLocation(JSFunction callback) {
         // TODO Auto-generated method stub
@@ -1504,7 +1504,7 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
 
     @Override
     public void phoneEdit(String parameter, JSFunction callback) {
-        MobEdit mobEdit = new MobEdit(parameter, this);
+        MobEdit mobEdit = new MobEdit(parameter, this,callback);
     }
 
 

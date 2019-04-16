@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.kinggrid.iappoffice.IAppOffice;
+import com.skyland.jsinterface.JSFunction;
 import com.skyland.zht.MainActivity;
 
 import java.io.BufferedReader;
@@ -42,12 +43,13 @@ public class MobEdit implements constant {
             .getExternalStorageDirectory().getPath().toString();//SD
     private String Des_Path;
     private static MobEditReceiver getRec;
-    private String  returnResult;
-
-    public MobEdit(String param, Activity context) {
+    private String returnResult;
+    public JSFunction mCallback;
+    public MobEdit(String param, Activity context,JSFunction callback) {
         Gson gson = new Gson();
         tempbean = gson.fromJson(param, TempBean.class);
         nContext = context;
+        mCallback = callback;
         //初始化服务端访问地址
         URL_Path = "http://" + tempbean.host + "/iWebOfficeService.data?action=ProcessRequest";
         //初始化文件夹
@@ -100,13 +102,13 @@ public class MobEdit implements constant {
         }
     }
 
-    public void getFileName(){
-     String fileName =   tempbean.sourcePath.substring(tempbean.sourcePath.lastIndexOf("/")+1);
-        Des_Path=  SDCARD_ROOT_PATH + "/ZHT/doc/"+fileName;
+    public void getFileName() {
+        String fileName = tempbean.sourcePath.substring(tempbean.sourcePath.lastIndexOf("/") + 1);
+        Des_Path = SDCARD_ROOT_PATH + "/ZHT/doc/" + fileName;
     }
 
     //
-    public void initIAppOffice(){
+    public void initIAppOffice() {
         iappoffice = new IAppOffice(nContext);
         iappoffice.setFileProviderAuthor("com.skyland.zht.fileProvider");
         iappoffice.setCopyRight(tempbean.copyRight);
@@ -135,19 +137,30 @@ public class MobEdit implements constant {
     //    打开网络文件
     public void openWebDocument() {
         boolean isInstalled = isWPSInstalled();
+        returnResult = "";
         if (isInstalled) {
-            new Thread() {
-                public void run() {
-                    downloadFile();
-                    appOpen();
-                }
-            }.start();
+            downloadThreadWatchar threadWatchar = new downloadThreadWatchar();
+            threadWatchar.start();
+            try {
+                threadWatchar.join();
+                if (returnResult.length() > 0) showTip("下载失败：" + returnResult);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         } else {
             showTip("请安装WPS专业版！");
         }
+        mCallback.executeWithParams("Success");
     }
 
-    public void appOpen(){
+    class downloadThreadWatchar extends Thread{
+        public  void run(){
+            returnResult = downloadFile();
+            if (returnResult.length() == 0) appOpen();
+        }
+    }
+
+    public void appOpen() {
         iappoffice.setUserName(tempbean.username);
         iappoffice.setFileName(Des_Path);
         iappoffice.setIsReviseMode(true);
@@ -155,9 +168,9 @@ public class MobEdit implements constant {
         iappoffice.setShowReviewingPaneRightDefault(false);
         iappoffice.appOpen(true);//打开文档，这里true表示打开本地文档
     }
-
     //从服务器下载文件到本地
-    public void downloadFile() {
+    public String downloadFile() {
+        String result = "";
         try {
             HttpURLConnection conn;
             int bytesum = 0;
@@ -188,11 +201,15 @@ public class MobEdit implements constant {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            result = e.getMessage();
+        } finally {
+            return result;
         }
     }
 
     //提示
     public void showTip(String tipInfor) {
+        mCallback.executeWithParams("erro:"+tipInfor);
         Toast.makeText(nContext, tipInfor, Toast.LENGTH_SHORT).show();
     }
 
@@ -320,27 +337,27 @@ public class MobEdit implements constant {
     }
 
     //关闭后询问是否上传服务器
-    public void floseAndAnswearUpload(){
+    public void floseAndAnswearUpload() {
         // 工厂设计模式，得到创建对话框的工厂
         AlertDialog.Builder builder = new AlertDialog.Builder(nContext);
         builder.setTitle("提示");
         builder.setMessage("是否保存到服务器？");
         builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
             Thread thread = null;
+
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                thread = new ThreadWatchar();
+                thread = new uloadThreadWatchar();
                 thread.start();
                 try {
                     thread.join();
-                    if(returnResult.length()>0)
-                    {
-                        Toast.makeText(nContext, "上传失败！"+returnResult, Toast.LENGTH_LONG).show();
-                    }else{
-                        Toast.makeText(nContext, "上传成功！"+returnResult, Toast.LENGTH_LONG).show();
+                    if (returnResult.length() > 0) {
+                        Toast.makeText(nContext, "上传失败！" + returnResult, Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(nContext, "上传成功！" + returnResult, Toast.LENGTH_LONG).show();
                     }
                 } catch (InterruptedException e) {
-                    Toast.makeText(nContext, "上传失败！"+returnResult+e, Toast.LENGTH_LONG).show();
+                    Toast.makeText(nContext, "上传失败！" + returnResult + e, Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
             }
@@ -367,9 +384,10 @@ public class MobEdit implements constant {
     }
 
     //广播接收
-    public class MobEditReceiver extends BroadcastReceiver{
+    public class MobEditReceiver extends BroadcastReceiver {
         boolean isSave = false;
         boolean isSaveAs = false;
+
         @Override
         public void onReceive(Context context, Intent intent) {
             if (BROADCAST_BACK_DOWN.equals(intent.getAction())) {
@@ -380,7 +398,7 @@ public class MobEdit implements constant {
                 isSave = true;
                 Log.d(TAG, BROADCAST_FILE_SAVE + " : file save");
             } else if (BROADCAST_FILE_CLOSE.equals(intent.getAction())) {
-                fileClose();
+               if(isSave) fileCloseAndUploadFile();
                 isSave = false;
                 Log.d(TAG, BROADCAST_FILE_CLOSE + " : file close");
             } else if ("com.kinggrid.notfind.office".equals(intent.getAction())) {
@@ -395,15 +413,15 @@ public class MobEdit implements constant {
         }
     }
 
-    class ThreadWatchar extends Thread{
+    class uloadThreadWatchar extends Thread {
         @Override
-        public void run(){
+        public void run() {
             returnResult = setUploadParam();
         }
     }
 
     //设置上传参数
-    private String setUploadParam(){
+    private String setUploadParam() {
         //上传的文件路径
         Gson gson = new Gson();
         Map<String, String> map = new HashMap<String, String>();
@@ -422,27 +440,28 @@ public class MobEdit implements constant {
         return result;
     }
 
-    public void fileClose() {
+    public void fileCloseAndUploadFile() {
         // 工厂设计模式，得到创建对话框的工厂
         AlertDialog.Builder builder = new AlertDialog.Builder(nContext);
         builder.setTitle("提示");
         builder.setMessage("是否保存到服务器？");
         builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
             Thread thread = null;
+
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                thread = new ThreadWatchar();
+                thread = new uloadThreadWatchar();
                 thread.start();
+                returnResult = "";
                 try {
                     thread.join();
-                    if(returnResult.length()>0)
-                    {
-                        Toast.makeText(nContext, "上传失败！"+returnResult, Toast.LENGTH_LONG).show();
-                    }else{
-                        Toast.makeText(nContext, "上传成功！"+returnResult, Toast.LENGTH_LONG).show();
+                    if (returnResult.length() > 0) {
+                        Toast.makeText(nContext, "上传失败！" + returnResult, Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(nContext, "上传成功！" + returnResult, Toast.LENGTH_LONG).show();
                     }
                 } catch (InterruptedException e) {
-                    Toast.makeText(nContext, "上传失败！"+returnResult+e, Toast.LENGTH_LONG).show();
+                    Toast.makeText(nContext, "上传失败！" + returnResult + e, Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
             }
