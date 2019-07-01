@@ -27,8 +27,8 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         String sql = "DROP TABLE IF EXISTS LocalStorage";
-        sqLiteDatabase.execSQL(sql);
-        onCreate(sqLiteDatabase);
+        sqLiteDatabase.execSQL(sql);onCreate(sqLiteDatabase);
+
     }
 
     private static String getMyDatabaseName(Context context) {

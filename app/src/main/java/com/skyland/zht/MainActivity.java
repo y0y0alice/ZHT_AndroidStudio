@@ -20,6 +20,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -81,6 +82,8 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -494,7 +497,28 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
 //        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
 //        StrictMode.setVmPolicy(builder.build());
 //        builder.detectFileUriExposure();
+        disableAPIDialog();
     }
+
+
+    /**
+     * 反射 禁止弹窗 安卓9.0
+     */
+    private void disableAPIDialog(){
+        if (Build.VERSION.SDK_INT < 28)return;
+        try {
+            Class clazz = Class.forName("android.app.ActivityThread");
+            Method currentActivityThread = clazz.getDeclaredMethod("currentActivityThread");
+            currentActivityThread.setAccessible(true);
+            Object activityThread = currentActivityThread.invoke(null);
+            Field mHiddenApiWarningShown = clazz.getDeclaredField("mHiddenApiWarningShown");
+            mHiddenApiWarningShown.setAccessible(true);
+            mHiddenApiWarningShown.setBoolean(activityThread, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     protected void onNewIntent(Intent intent) {
