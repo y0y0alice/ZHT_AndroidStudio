@@ -124,6 +124,7 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
     };
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private Dao dao;
+    MobEdit mobEdit;
     // LPAPI 打印机操作相关的回调函数。
     private final LPAPI.Callback mCallback = new LPAPI.Callback() {
 
@@ -978,6 +979,10 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
         // TODO Auto-generated method stub
         super.onDestroy();
         unregisterReceiver(fileReceiver);
+        if(mobEdit.getRec!=null&&mobEdit!=null){
+            unregisterReceiver( mobEdit.getRec);
+            mobEdit.getRec = null;
+        }
         if (!isTab) {
             App.shared.setFirstload(true);
         }
@@ -1528,7 +1533,7 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
 
     @Override
     public void phoneEdit(String parameter, JSFunction callback) {
-        MobEdit mobEdit = new MobEdit(parameter, this,callback);
+        mobEdit = new MobEdit(parameter, this,callback);
     }
 
 

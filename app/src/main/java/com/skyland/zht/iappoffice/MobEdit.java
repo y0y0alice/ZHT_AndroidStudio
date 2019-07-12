@@ -42,7 +42,7 @@ public class MobEdit implements constant {
     private static final String SDCARD_ROOT_PATH = Environment
             .getExternalStorageDirectory().getPath().toString();//SD
     private String Des_Path;
-    private static MobEditReceiver getRec;
+    public static MobEditReceiver getRec;
     private String returnResult;
     public JSFunction mCallback;
     public MobEdit(String param, Activity context,JSFunction callback) {
@@ -336,40 +336,7 @@ public class MobEdit implements constant {
         }
     }
 
-    //关闭后询问是否上传服务器
-    public void floseAndAnswearUpload() {
-        // 工厂设计模式，得到创建对话框的工厂
-        AlertDialog.Builder builder = new AlertDialog.Builder(nContext);
-        builder.setTitle("提示");
-        builder.setMessage("是否保存到服务器？");
-        builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
-            Thread thread = null;
 
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                thread = new uloadThreadWatchar();
-                thread.start();
-                try {
-                    thread.join();
-                    if (returnResult.length() > 0) {
-                        Toast.makeText(nContext, "上传失败！" + returnResult, Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(nContext, "上传成功！" + returnResult, Toast.LENGTH_LONG).show();
-                    }
-                } catch (InterruptedException e) {
-                    Toast.makeText(nContext, "上传失败！" + returnResult + e, Toast.LENGTH_LONG).show();
-                    e.printStackTrace();
-                }
-            }
-        });
-        builder.setNegativeButton("否", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(nContext, "选择否", Toast.LENGTH_SHORT).show();
-            }
-        });
-        builder.show();
-    }
 
     //手机在线编辑参数转换模板
     class TempBean {
