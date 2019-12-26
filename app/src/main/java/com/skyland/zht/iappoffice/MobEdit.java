@@ -117,6 +117,7 @@ public class MobEdit implements constant {
 
     //初始化文件夹
     public void initDoccument() {
+        judeDirExists(new File(SDCARD_ROOT_PATH + "/ZHT/"));
         judeDirExists(new File(SDCARD_ROOT_PATH + "/ZHT/doc/"));
     }
 

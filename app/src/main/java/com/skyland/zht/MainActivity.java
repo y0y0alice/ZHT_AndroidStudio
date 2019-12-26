@@ -117,6 +117,7 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
     boolean isResume = false;
     Dialog dialog;
     LPAPI api;
+    WebSettings webSetting;
     List<IDzPrinter.PrinterAddress> pairedPrinters = new ArrayList<IDzPrinter.PrinterAddress>();
     private static String[] PERMISSIONS_STORAGE = {
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -202,103 +203,6 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
             }
         }
     };
-
-
-    //    @Override
-    protected void onCreate1(Bundle savedInstanceState) {
-        //   verifyStoragePermissions(this);
-        super.onCreate(savedInstanceState);
-        dao = new Dao(this);
-        //初始化建基本表
-        dao.initSysTable();
-
-        setContentView(R.layout.activity_login_options);
-        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
-        // TODO Auto-generated method stub
-        Log.d("Msg", "SharedPreferences");
-        final SharedPreferences settings = PreferenceManager
-                .getDefaultSharedPreferences(this);
-        //在线地址
-        String addressString = settings.getString("address_preference", "");
-        if (!addressString.equals("") && !addressString.endsWith("/"))
-            addressString = addressString + "/";
-        //离线地址
-        final String offlineString = settings.getString("address_offline", "");
-
-        btnSetting = (Button) findViewById(R.id.setting);
-        btnSetting.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO Auto-generated method stub
-                if (Config.customSetting) {
-                    Intent intent = new Intent(MainActivity.this,
-                            CustomSettingActivity.class);
-                    startActivityForResult(intent, Config.SETTING_REQUEST_CODE);
-                } else {
-                    Intent intent = new Intent(MainActivity.this,
-                            SettingActivity.class);
-                    startActivityForResult(intent, Config.SETTING_REQUEST_CODE);
-                }
-            }
-        });
-        final LinearLayout settingView2 = (LinearLayout) findViewById(R.id.optionView);
-        httpClient = new AsyncHttpClient();
-        httpClient.setTimeout(120000);
-        mWebView = (JSWebView) findViewById(R.id.webView);
-        mWebView.setWebViewClient(new WebClient());
-        mWebView.setWebChromeClient(new WebChrome());
-        final WebSettings webSetting = mWebView.getSettings();
-        webSetting.setJavaScriptEnabled(true);
-        webSetting.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        webSetting.setAllowFileAccess(true);
-        webSetting.setAppCacheEnabled(true);
-        webSetting.setDomStorageEnabled(true);
-        webSetting.setDatabaseEnabled(true);
-        webSetting.setUseWideViewPort(true);
-        webSetting.setLoadWithOverviewMode(true);
-        //lufei20180926
-        webSetting.setAppCacheMaxSize(1024 * 1024 * 8);//设置缓冲大小，我设的是8M
-        String appCacheDir = this.getApplicationContext().getDir("cache", Context.MODE_PRIVATE).getPath();
-        webSetting.setAppCachePath(appCacheDir);
-
-        //在线加载
-        onlineBtn = (Button) findViewById(R.id.onlineBtn);
-        final String finalAddressString = addressString;
-        onlineBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                App.shared.setHost(finalAddressString);
-                String loadUrl = App.shared.getUrl(Config.MainPage);
-                if (!loadUrl.equals("")) {
-                    webSetting.setCacheMode(WebSettings.LOAD_NO_CACHE);
-                    settingView2.setVisibility(View.GONE);
-                    mWebView.loadUrl(loadUrl);
-                }
-            }
-        });
-        //离线加载
-        offlineBtn = (Button) findViewById(R.id.offlineBtn);
-        offlineBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String loadUrl = offlineString;
-                if (!loadUrl.equals("")) {
-                    settingView2.setVisibility(View.GONE);
-                    webSetting.setCacheMode(WebSettings.LOAD_DEFAULT);
-                    mWebView.loadUrl(loadUrl);
-                }
-            }
-        });
-        settingView2.setVisibility(View.VISIBLE);
-        App.shared.startTagService();
-        App.shared.setFirstload(false);
-
-        // 初始化 IDzPrinter 对象（简单起见，不处理结果通知）
-        IDzPrinter.Factory.getInstance().init(this, null);
-
-        // 调用LPAPI对象的init方法初始化对象
-        this.api = LPAPI.Factory.createInstance(mCallback);
-    }
 
     /**
      * Checks if the app has permission to write to device storage
@@ -408,15 +312,15 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
         mWebView = (JSWebView) findViewById(R.id.webView);
         mWebView.setWebViewClient(new WebClient());
         mWebView.setWebChromeClient(new WebChrome());
-        WebSettings webSetting = mWebView.getSettings();
+        webSetting = mWebView.getSettings();
         webSetting.setJavaScriptEnabled(true);
         webSetting.setCacheMode(WebSettings.LOAD_NO_CACHE);
         webSetting.setAllowFileAccess(true);
         webSetting.setAppCacheEnabled(true);
         webSetting.setDomStorageEnabled(true);
         webSetting.setDatabaseEnabled(true);
-        webSetting.setUseWideViewPort(true);
-        webSetting.setLoadWithOverviewMode(true);
+
+        webSetting.setTextSize(WebSettings.TextSize.NORMAL);
 //缓存设置
 
         mWebView.addJavascriptInterface(this);
@@ -484,6 +388,7 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
                 mWebView.loadUrl(loadUrl + "?appid="
                         + App.shared.getDeviceId());
             }
+            SetTextSize(settings);
         }
         App.shared.startTagService();
         setOrientation();
@@ -505,8 +410,8 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
     /**
      * 反射 禁止弹窗 安卓9.0
      */
-    private void disableAPIDialog(){
-        if (Build.VERSION.SDK_INT < 28)return;
+    private void disableAPIDialog() {
+        if (Build.VERSION.SDK_INT < 28) return;
         try {
             Class clazz = Class.forName("android.app.ActivityThread");
             Method currentActivityThread = clazz.getDeclaredMethod("currentActivityThread");
@@ -754,13 +659,23 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
         EZOpenSDK.getInstance().logout();
     }
 
+    /**
+     * 设置网页字体大小
+     *
+     * @param settings
+     */
+    public void SetTextSize(SharedPreferences settings) {
+        String textSize = settings.getString("textSize", "normal");
+        setTextSize(textSize);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        SharedPreferences settings = PreferenceManager
+                .getDefaultSharedPreferences(this);
         // TODO Auto-generated method stub
         if (requestCode == Config.SETTING_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                SharedPreferences settings = PreferenceManager
-                        .getDefaultSharedPreferences(this);
                 String addressString = settings.getString("address_preference",
                         "");
                 if (!addressString.equals("")) {
@@ -772,7 +687,9 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
                             + App.shared.getDeviceId();
                     mWebView.loadUrl(url);
                 }
+
             }
+            SetTextSize(settings);
         } else if (requestCode == Config.ALBUM_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 if (null != data) {
@@ -839,6 +756,23 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
             } else {
                 // jsCallBack.executeWithParams("", "0");
             }
+        }
+    }
+
+    public void setTextSize(String textSize) {
+        switch (textSize) {
+            case "small":
+                webSetting.setTextSize(WebSettings.TextSize.SMALLER);
+                break;
+            case "normal":
+                webSetting.setTextSize(WebSettings.TextSize.NORMAL);
+                break;
+            case "larger":
+                webSetting.setTextSize(WebSettings.TextSize.LARGER);
+                break;
+            case "largest":
+                webSetting.setTextSize(WebSettings.TextSize.LARGEST);
+                break;
         }
     }
 
@@ -979,8 +913,8 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
         // TODO Auto-generated method stub
         super.onDestroy();
         unregisterReceiver(fileReceiver);
-        if(mobEdit.getRec!=null&&mobEdit!=null){
-            unregisterReceiver( mobEdit.getRec);
+        if (mobEdit.getRec != null && mobEdit != null) {
+            unregisterReceiver(mobEdit.getRec);
             mobEdit.getRec = null;
         }
         if (!isTab) {
@@ -1277,6 +1211,7 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
                 + longitude + "}";
         jsCallBack.executeWithParams(args);
     }
+
     @Override
 
     @JavascriptInterface
@@ -1467,9 +1402,12 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
         return true;
     }
 
-
-    //陆菲20180828 精臣打印机部分
-    //文字打印
+    /**
+     * 精臣打印机部分
+     *
+     * @param parameter
+     * @param callback
+     */
     public void printTextByJC(String parameter, JSFunction callback) {
         try {
             if (!isJCPrinterConnected()) {
@@ -1533,7 +1471,7 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
 
     @Override
     public void phoneEdit(String parameter, JSFunction callback) {
-        mobEdit = new MobEdit(parameter, this,callback);
+        mobEdit = new MobEdit(parameter, this, callback);
     }
 
 
