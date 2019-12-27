@@ -44,18 +44,26 @@
                 android:orientation="horizontal" >
 
                 <Button
+                    android:id="@+id/btnReload"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="刷新"
+                    android:textColor="@android:color/black"
+                    />
+
+                <Button
                     android:id="@+id/btnOrientation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="屏幕旋转"
-                    android:textColor="@android:color/white" />
+                    android:textColor="@android:color/black" />
 
                 <Button
                     android:id="@+id/btnSetting"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="设置"
-                    android:textColor="@android:color/white" />
+                    android:textColor="@android:color/black" />
             </LinearLayout>
 
             

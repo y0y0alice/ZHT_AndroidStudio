@@ -110,6 +110,7 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
     Button onlineBtn;//在线加载
     Button offlineBtn;//离线加载
     Button btnOrientation;
+    Button btnReload;//刷新按钮
     RelativeLayout settingView;
     boolean isTab = false;
     ImageButton btnBack;
@@ -126,6 +127,7 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private Dao dao;
     MobEdit mobEdit;
+
     // LPAPI 打印机操作相关的回调函数。
     private final LPAPI.Callback mCallback = new LPAPI.Callback() {
 
@@ -293,6 +295,10 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
                 }
             }
         });
+        //刷新
+        btnReload = (Button) findViewById(R.id.btnReload);
+        btnReload.setOnClickListener(new reloadPage());
+
         handler = new Handler(new Handler.Callback() {
 
             @Override
@@ -406,6 +412,12 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
         disableAPIDialog();
     }
 
+    private class reloadPage implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            mWebView.reload();
+        }
+    }
 
     /**
      * 反射 禁止弹窗 安卓9.0

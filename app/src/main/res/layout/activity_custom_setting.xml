@@ -35,8 +35,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:text="保存"
-            android:textColor="@android:color/white" />
+            android:text="保存并重登录"
+            android:textColor="@android:color/black" />
     </RelativeLayout>
 
     <LinearLayout
