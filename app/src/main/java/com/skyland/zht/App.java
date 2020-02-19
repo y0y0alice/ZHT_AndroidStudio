@@ -40,7 +40,7 @@ public class App extends Application {
     private boolean connected = true;
     public boolean tagServiceRuning;
     private PersistentCookieStore cookieStore;
-    private int orientation = 1;
+    private int orientation = 0;//0默认为旋转1为锁定
     private boolean firstload = true;
     private AMapLocationClient locationClient = null;
     private AMapLocationClientOption locationOption = new AMapLocationClientOption();

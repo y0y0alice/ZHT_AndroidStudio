@@ -60,6 +60,7 @@ import com.skyland.jsinterface.JSFunction;
 import com.skyland.jsinterface.JSWebView;
 import com.skyland.zht.iappoffice.MobEdit;
 import com.tencent.smtt.export.external.interfaces.JsResult;
+import com.tencent.smtt.sdk.DownloadListener;
 import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
@@ -318,6 +319,16 @@ public class MainActivity extends CheckPermissionsActivity implements JSBridge, 
         mWebView = (JSWebView) findViewById(R.id.webView);
         mWebView.setWebViewClient(new WebClient());
         mWebView.setWebChromeClient(new WebChrome());
+        mWebView.setDownloadListener(new DownloadListener() {
+            @Override
+            public void onDownloadStart(String s, String s1, String s2, String s3, long l) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                intent.setData(Uri.parse(s));
+                startActivity(intent);
+            }
+        });
+
         webSetting = mWebView.getSettings();
         webSetting.setJavaScriptEnabled(true);
         webSetting.setCacheMode(WebSettings.LOAD_NO_CACHE);
