@@ -41,6 +41,8 @@ dependencies {
     implementation files('libs/xUtils-2.6.14.jar')
     implementation 'com.android.support:appcompat-v7:24.0.0'
     implementation 'com.hikvision.ezviz:ezuikit:2.0'
+    //implementation 'org.apache.httpcomponents:httpcore:4.4.2'
+    implementation 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2'
     implementation files('libs/DzPrinter.jar')
-    implementation files('libs/iAppOffice_V3.2.0.264_20180928A.jar')
+    implementation files('libs/iAppOffice_V3.2.0.268_20190621A.jar')
 }
